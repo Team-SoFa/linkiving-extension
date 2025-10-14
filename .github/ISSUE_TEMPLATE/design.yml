@@ -1,0 +1,17 @@
+name: "🎨 Design"
+description: "디자인 이슈"
+labels: ["Design"]
+projects: ["Team-SoFa/4"]
+body:
+  - type: textarea
+    attributes:
+      label: 이슈 내용
+      description: 디자인 수정 사항에 대한 설명을 작성해 주세요. 스크린 샷은 필수입니다.
+      placeholder: 자세히 적을수록 좋습니다!
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 참고 자료
+      description: 참고 자료가 있다면 작성해 주세요.
