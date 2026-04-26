@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Linkiving Extension",
+  "version": "0.1.0",
+  "description": "Linkiving popup for quickly saving links.",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["tabs", "activeTab", "cookies", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["linkiving-page-toast.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["next/*", "*.js", "*.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+@import '../styles/globals.css';
+
+html,
+body {
+  margin: 0;
+  min-width: 400px;
+  background: var(--color-gray50);
+}
+
+* {
+  box-sizing: border-box;
+}

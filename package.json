@@ -1,0 +1,41 @@
+{
+  "name": "linkiving-extension",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.19.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --webpack && node scripts/copy-extension.mjs",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@reactuses/core": "^6.3.1",
+    "@svgr/webpack": "^8.1.0",
+    "@tanstack/react-query": "^5.75.7",
+    "clsx": "^2.1.1",
+    "next": "16.0.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.68.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwind-variants": "^3.2.2",
+    "zod": "^4.1.13",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.32.0",
+    "eslint-config-next": "15.3.0",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5"
+  }
+}

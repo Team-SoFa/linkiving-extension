@@ -1,0 +1,129 @@
+@layer components {
+  /* ========== COMMON ========== */
+  /* text */
+  .text-default { @apply text-gray900; }
+  .text-placeholder { @apply text-gray500; }
+  
+  /* etc */
+  .text-etc-linkcard-summary { @apply text-gray700; }
+  
+  /* bg-feedback */
+  .bg-success-light { @apply bg-green50; }
+  .bg-success-dark { @apply bg-green500; }
+  
+  .bg-error-light { @apply bg-red50; }
+  .bg-error-dark { @apply bg-red500; }
+  
+  .bg-feedback-inform-light { @apply bg-skyblue50; }
+  .bg-inform-dark { @apply bg-skyblue500; }
+  
+  .bg-warning-light { @apply bg-yellow50; }
+  .bg-warning-dark { @apply bg-yellow500; }
+  
+  /* accent */
+  .text-accent-default{ @apply text-blue400; }
+  
+  /* ========== accordion ========== */
+  .text-accordion { @apply text-gray400; }
+  .text-accordion:hover { @apply hover:text-gray500; }
+  .text-accordion:focus { @apply focus:text-gray500; }
+  
+  /* ========== ANCHOR ========== */
+  .text-anchor { @apply text-gray400; }
+  .text-anchor:hover { @apply hover:text-gray500; }
+  .text-anchor:focus { @apply focus:text-gray500; }
+  
+  /* ========== DIVIDER ========== */
+  /* Use direct color values so dividers render even when @apply is not processed (e.g. Storybook/Turbopack). */
+  .divider-gray100 { background-color: var(--color-gray100); }
+  .divider-gray200 { background-color: var(--color-gray200); }
+  .divider-gray300 { background-color: var(--color-gray300); }
+  .divider-blue { background-color: var(--color-gray400); }
+
+
+  /* ========== BUTTON ========== */
+
+  /* primary/accent/filled (추후 다른 primary 소속디자인이 추가된다면 수정) */
+  .bg-btn-primary { @apply bg-gray900; }
+  .bg-btn-primary:hover { @apply hover:bg-gray800; }
+  .bg-btn-primary:focus { @apply focus:bg-gray800; }
+  .bg-btn-primary:active{@apply active:bg-gray700;}
+  .bg-btn-primary:disabled {@apply disabled:bg-gray100; }
+
+  .border-btn-primary { @apply border-gray900; }
+  .border-btn-primary:hover { @apply hover:border-gray800; }
+  .border-btn-primary:focus { @apply focus:border-gray800; }
+  .border-btn-primary:active { @apply active:border-gray700; }
+  .border-btn-primary:disabled { @apply disabled:border-gray100; } 
+
+  .text-btn-primary { @apply text-white; }
+  .text-btn-primary:hover { @apply hover:text-white; }
+  .text-btn-primary:focus { @apply focus:text-white; }
+  .text-btn-primary:active { @apply active:text-white; }
+  .text-btn-primary:disabled {@apply disabled:text-gray200; }
+  
+  /* secondary/accent/tonal (추후 다른 secondary 소속 디자인이 추가된다면 수정) */
+  .bg-btn-secondary { @apply bg-white; }
+  .bg-btn-secondary:hover { @apply hover:bg-blue50; }
+  .bg-btn-secondary:focus { @apply focus:bg-blue50; }
+  .bg-btn-secondary:active { @apply active:bg-blue100; }
+  .bg-btn-secondary:disabled {@apply disabled:bg-gray100; }
+
+  .border-btn-secondary { @apply border-blue300; }
+  .border-btn-secondary:hover { @apply hover:border-blue300; }
+  .border-btn-secondary:focus { @apply focus:border-blue300; }
+  .border-btn-secondary:active { @apply active:border-blue300; }
+  .border-btn-secondary:disabled {@apply disabled:border-gray200; }
+
+  .text-btn-secondary { @apply text-blue500; }
+  .text-btn-secondary:hover { @apply hover:text-blue500; }
+  .text-btn-secondary:focus { @apply focus:text-blue500; }
+  .text-btn-secondary:active { @apply active:text-blue500; }
+  .text-btn-secondary:disabled {@apply disabled:text-gray200; }
+
+  /* tertiary/neutral/outlined */
+  .bg-btn-tertiary-neutral { @apply bg-white; }
+  .bg-btn-tertiary-neutral:hover { @apply hover:bg-gray50; }
+  .bg-btn-tertiary-neutral:focus { @apply focus:bg-gray50; }
+  .bg-btn-tertiary-neutral:active { @apply active:bg-gray100; }
+  .bg-btn-tertiary-neutral:disabled {@apply disabled:bg-gray100; }
+
+  .border-btn-tertiary-neutral { @apply border-gray200; }
+  .border-btn-tertiary-neutral:hover { @apply hover:border-gray200; }
+  .border-btn-tertiary-neutral:focus { @apply focus:border-gray200; }
+  .border-btn-tertiary-neutral:active { @apply active:border-gray200; }
+  .border-btn-tertiary-neutral:disabled {@apply disabled:border-gray200; }
+
+  .text-btn-tertiary-neutral { @apply text-gray700; }
+  .text-btn-tertiary-neutral:hover { @apply hover:text-gray700; }
+  .text-btn-tertiary-neutral:focus { @apply focus:text-gray700; }
+  .text-btn-tertiary-neutral:active { @apply active:text-gray700; }
+  .text-btn-tertiary-neutral:disabled {@apply disabled:text-gray200; }
+
+  /* tertiary/subtle/ghost (현재 해당 디자인 컴포넌트의 위치(onpanel/onmain)에 따라 배경색상만 달라지기 때문에 공용스타일 정의)*/
+  .border-btn-tertiary-subtle { @apply border-none; }
+  .border-btn-tertiary-subtle:hover { @apply hover:border-none; }
+  .border-btn-tertiary-subtle:focus { @apply focus:border-none; }
+  .border-btn-tertiary-subtle:active { @apply active:border-none; }
+  .border-btn-tertiary-subtle:disabled { @apply disabled:border-none; }
+
+  .text-btn-tertiary-subtle { @apply text-gray500; }
+  .text-btn-tertiary-subtle:hover { @apply hover:text-gray700; }
+  .text-btn-tertiary-subtle:focus { @apply focus:text-gray700; }
+  .text-btn-tertiary-subtle:active { @apply active:text-gray700; }
+  .text-btn-tertiary-subtle:disabled { @apply disabled:text-gray200; }
+
+  /* bg: tertiary/subtle/ghost/onPanel*/
+  .bg-btn-tertiary-subtle-onpanel { @apply bg-transparent; }
+  .bg-btn-tertiary-subtle-onpanel:hover { background-color: color-mix(in srgb, var(--color-blue100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onpanel:focus { background-color: color-mix(in srgb, var(--color-blue100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onpanel:active { background-color: color-mix(in srgb, var(--color-blue100) 80%, transparent); }
+  .bg-btn-tertiary-subtle-onpanel:disabled { @apply disabled:bg-none; }
+
+  /* bg: tertiary/subtle/ghost/onMain*/
+  .bg-btn-tertiary-subtle-onmain { @apply bg-transparent; }
+  .bg-btn-tertiary-subtle-onmain:hover { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onmain:focus { background-color: color-mix(in srgb, var(--color-gray100) 52%, transparent); }
+  .bg-btn-tertiary-subtle-onmain:active { background-color: color-mix(in srgb, var(--color-gray100) 80%, transparent); }
+  .bg-btn-tertiary-subtle-onmain:disabled { @apply disabled:bg-none; }
+}
