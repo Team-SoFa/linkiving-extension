@@ -58,6 +58,40 @@ function closeExtensionPanel() {
   window.close();
 }
 
+function getHttpTabUrl(tab: chrome.tabs.Tab | undefined) {
+  const tabUrl = tab?.url?.trim();
+  if (!tabUrl || getUnsupportedTabReason(tabUrl)) {
+    return null;
+  }
+
+  return normalizeHttpUrl(tabUrl);
+}
+
+async function findRecentHttpTab(excludedTabId: number | null) {
+  if (typeof chrome === 'undefined' || !chrome.tabs?.query) {
+    return null;
+  }
+
+  const tabs = await chrome.tabs.query({});
+  const candidates = tabs
+    .filter(tab => tab.id !== excludedTabId && getHttpTabUrl(tab))
+    .sort((a, b) => {
+      if (a.active !== b.active) {
+        return a.active ? -1 : 1;
+      }
+
+      return (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0);
+    });
+
+  const tab = candidates[0];
+  const url = getHttpTabUrl(tab);
+  if (!tab || !url) {
+    return null;
+  }
+
+  return { tabId: typeof tab.id === 'number' ? tab.id : null, url };
+}
+
 export default function AddLinkPanel() {
   const createLink = usePostLinks();
   const qc = useQueryClient();
@@ -109,6 +143,20 @@ export default function AddLinkPanel() {
 
         const unsupportedReason = getUnsupportedTabReason(sourceTabUrl);
         if (unsupportedReason) {
+          const fallbackTab = await findRecentHttpTab(sourceTabRef.current.sourceTabId);
+          if (fallbackTab) {
+            sourceTabRef.current = {
+              sourceTabUrl: fallbackTab.url,
+              sourceTabId: fallbackTab.tabId,
+            };
+            setCurrentTabMessage(null);
+            setValue('url', fallbackTab.url, {
+              shouldDirty: force,
+              shouldValidate: true,
+            });
+            return;
+          }
+
           setCurrentTabMessage(unsupportedReason);
           return;
         }

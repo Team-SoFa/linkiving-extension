@@ -11,10 +11,12 @@ declare namespace chrome {
     interface Tab {
       id?: number;
       url?: string;
+      active?: boolean;
+      lastAccessed?: number;
     }
 
     function query(
-      queryInfo: { active?: boolean; currentWindow?: boolean },
+      queryInfo: { active?: boolean; currentWindow?: boolean; lastFocusedWindow?: boolean },
       callback?: (tabs: Tab[]) => void
     ): Promise<Tab[]>;
 
@@ -23,6 +25,20 @@ declare namespace chrome {
       message: unknown,
       callback?: (response: TResponse) => void
     ): Promise<TResponse>;
+
+    const onActivated: {
+      addListener(callback: (activeInfo: { tabId: number }) => void): void;
+    };
+
+    const onUpdated: {
+      addListener(
+        callback: (
+          tabId: number,
+          changeInfo: { status?: string; url?: string },
+          tab: Tab
+        ) => void
+      ): void;
+    };
   }
 
   namespace scripting {
@@ -30,5 +46,10 @@ declare namespace chrome {
       target: { tabId: number };
       files: string[];
     }): Promise<unknown[]>;
+  }
+
+  namespace action {
+    function setTitle(details: { title: string }): Promise<void>;
+    function setPopup(details: { tabId?: number; popup: string }): Promise<void>;
   }
 }

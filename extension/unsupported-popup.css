@@ -1,0 +1,37 @@
+html,
+body {
+  width: 360px;
+  min-height: 88px;
+  margin: 0;
+  background: var(--color-white, #ffffff);
+}
+
+.unsupported-popup {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+}
+
+.warning-icon {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: var(--color-yellow300, #ffde5c);
+  color: var(--color-gray900, #11131d);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  padding-top: 6px;
+}
+
+p {
+  margin: 0;
+  flex: 1;
+}

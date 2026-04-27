@@ -14,8 +14,11 @@ const root = process.cwd();
 const outDir = join(root, 'out');
 const nextDir = join(outDir, 'next', '_next');
 const staticDir = join(outDir, '_next');
+const nextCssDir = join(nextDir, 'static', 'css');
 const extensionDir = join(root, 'extension');
 const manifestPath = join(outDir, 'manifest.json');
+const unsupportedPopupPath = join(outDir, 'unsupported-popup.html');
+const globalCssPlaceholder = '__LINKIVING_GLOBAL_CSS__';
 mkdirSync(outDir, { recursive: true });
 
 if (existsSync(staticDir)) {
@@ -70,6 +73,51 @@ function collectHtmlFiles(targetDir, results = []) {
   return results;
 }
 
+function collectCssFiles(targetDir, results = []) {
+  if (!existsSync(targetDir)) return results;
+
+  for (const entry of readdirSync(targetDir)) {
+    const fullPath = join(targetDir, entry);
+    const stats = statSync(fullPath);
+
+    if (stats.isDirectory()) {
+      collectCssFiles(fullPath, results);
+      continue;
+    }
+
+    if (entry.endsWith('.css')) {
+      results.push(fullPath);
+    }
+  }
+
+  return results;
+}
+
+function injectGlobalStylesheetIntoUnsupportedPopup() {
+  if (!existsSync(unsupportedPopupPath)) return;
+
+  const html = readFileSync(unsupportedPopupPath, 'utf8');
+  if (!html.includes(globalCssPlaceholder)) return;
+
+  const [globalCssPath] = collectCssFiles(nextCssDir).sort((a, b) => statSync(b).size - statSync(a).size);
+
+  if (!globalCssPath) {
+    writeFileSync(
+      unsupportedPopupPath,
+      html.replace(/\s*<link[^>]+data-linkiving-global-css[^>]*>\s*/i, '\n    '),
+      'utf8'
+    );
+    return;
+  }
+
+  const stylesheetHref = relative(dirname(unsupportedPopupPath), globalCssPath).replace(/\\/g, '/');
+  writeFileSync(
+    unsupportedPopupPath,
+    html.replace(globalCssPlaceholder, stylesheetHref),
+    'utf8'
+  );
+}
+
 function removeGeneratedInlineScripts(targetDir) {
   for (const entry of readdirSync(targetDir)) {
     const fullPath = join(targetDir, entry);
@@ -121,6 +169,7 @@ function normalizeManifest() {
 }
 
 normalizeManifest();
+injectGlobalStylesheetIntoUnsupportedPopup();
 removeGeneratedInlineScripts(outDir);
 
 for (const htmlFilePath of collectHtmlFiles(outDir)) {

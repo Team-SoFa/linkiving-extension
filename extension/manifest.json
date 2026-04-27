@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "description": "Linkiving popup for quickly saving links.",
   "action": {
-    "default_title": "Linkiving"
+    "default_title": "Linkiving",
+    "default_popup": "unsupported-popup.html"
   },
   "background": {
     "service_worker": "background.js"
