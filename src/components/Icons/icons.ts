@@ -89,6 +89,7 @@ export const IconMap = {
 export type IconMapTypes = keyof typeof IconMap;
 
 export const IconSizes = {
+  xxs: 12,
   xs: 14,
   sm: 16,
   md: 18,

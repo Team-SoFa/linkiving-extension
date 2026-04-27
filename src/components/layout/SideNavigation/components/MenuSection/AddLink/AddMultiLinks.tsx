@@ -152,7 +152,9 @@ export default function AddMultiLinks({ onToggle }: { onToggle: () => void }) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <Label>링크 주소</Label>
+        <Label textSize="sm" className="text-gray900">
+          링크 주소
+        </Label>
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <AddLinkUrlInput
@@ -269,6 +271,7 @@ export default function AddMultiLinks({ onToggle }: { onToggle: () => void }) {
 
       <Button
         label={isSaving ? '저장 중...' : isLoading ? '크롤링 중...' : `${links.length}개 저장하기`}
+        size="md"
         disabled={links.length === 0 || isLoading || isSaving}
         onClick={handleSave}
       />

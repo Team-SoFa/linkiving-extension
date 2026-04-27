@@ -1,5 +1,5 @@
 import { useLinkMetaScrape } from '@/hooks/useLinkMetaScrape';
-import { MAX_MEMO_LENGTH } from '@/lib/constants/link';
+import { MAX_MEMO_LENGTH, MAX_TITLE_LENGTH } from '@/lib/constants/link';
 import { getReadableUrlLabel, normalizeHttpUrl } from '@/lib/url';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
@@ -14,7 +14,11 @@ const addLinkSchema = z.object({
       message: '유효하지 않은 링크 주소입니다. URL을 다시 확인해 주세요.',
     })
     .transform(value => normalizeHttpUrl(value) as string),
-  title: z.string().trim().min(1, { message: '제목을 입력해 주세요.' }),
+  title: z
+    .string()
+    .trim()
+    .min(1, { message: '제목을 입력해 주세요.' })
+    .max(MAX_TITLE_LENGTH, { message: `제목은 ${MAX_TITLE_LENGTH}자 이하로 입력해 주세요.` }),
   memo: z.string().max(MAX_MEMO_LENGTH).optional(),
 });
 

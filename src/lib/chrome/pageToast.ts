@@ -16,6 +16,7 @@ interface PageToastMessage {
 interface PageToastOptions {
   actionLabel?: string;
   actionUrl?: string;
+  sourceTabId?: number | null;
 }
 
 async function getActiveWebTab() {
@@ -54,6 +55,16 @@ export async function showCurrentPageToast(
   variant: ToastVariant = 'success',
   options: PageToastOptions = {}
 ) {
+  if (options.sourceTabId) {
+    return sendPageToastMessage(options.sourceTabId, {
+      type: PAGE_TOAST_MESSAGE_TYPE,
+      message,
+      variant,
+      actionLabel: options.actionLabel,
+      actionUrl: options.actionUrl,
+    });
+  }
+
   const tab = await getActiveWebTab();
   if (!tab?.id) {
     return false;

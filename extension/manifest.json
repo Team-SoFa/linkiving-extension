@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "description": "Linkiving popup for quickly saving links.",
   "action": {
-    "default_popup": "index.html"
+    "default_title": "Linkiving"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "permissions": ["tabs", "activeTab", "cookies", "scripting"],
   "host_permissions": ["http://*/*", "https://*/*"],
@@ -17,7 +20,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["next/*", "*.js", "*.css"],
+      "resources": ["index.html", "next/*", "*.js", "*.css", "fonts/*", "images/*"],
       "matches": ["<all_urls>"]
     }
   ]

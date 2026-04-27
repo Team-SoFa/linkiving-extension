@@ -29,7 +29,9 @@ export default function LinkThumbnailTitleSection({
 }: Props) {
   return (
     <section className="border-gray100 border-b px-6 py-6">
-      <Label className="mb-3 block text-gray900">{label}</Label>
+      <Label textSize="sm" className="mb-3 block text-gray900">
+        {label}
+      </Label>
       <div className="grid grid-cols-[10rem_minmax(0,1fr)] gap-2">
         <div
           className={`border-gray100 relative h-[5rem] overflow-hidden rounded-lg border bg-white ${

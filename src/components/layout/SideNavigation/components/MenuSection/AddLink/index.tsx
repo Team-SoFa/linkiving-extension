@@ -29,6 +29,35 @@ function appUrl(path = '') {
   return `${APP_BASE_URL.replace(/\/$/, '')}${path}`;
 }
 
+function getPopupSourceTab() {
+  if (typeof window === 'undefined') {
+    return { sourceTabUrl: null, sourceTabId: null };
+  }
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const sourceTabUrl = searchParams.get('sourceTabUrl');
+  const rawSourceTabId = searchParams.get('sourceTabId');
+  const sourceTabId = rawSourceTabId ? Number(rawSourceTabId) : null;
+
+  return {
+    sourceTabUrl,
+    sourceTabId: Number.isFinite(sourceTabId) ? sourceTabId : null,
+  };
+}
+
+function closeExtensionPanel() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'LINKIVING_CLOSE_OVERLAY' }, '*');
+    return;
+  }
+
+  window.close();
+}
+
 export default function AddLinkPanel() {
   const createLink = usePostLinks();
   const qc = useQueryClient();
@@ -37,6 +66,7 @@ export default function AddLinkPanel() {
   const [currentTabMessage, setCurrentTabMessage] = useState<string | null>(null);
   const isSubmitting = createLink.isPending || isUpdatingDuplicate;
   const lastMetaErrorRef = useRef<string | null>(null);
+  const sourceTabRef = useRef(getPopupSourceTab());
 
   const {
     form,
@@ -70,6 +100,33 @@ export default function AddLinkPanel() {
 
   const loadCurrentTabUrl = useCallback(
     async (force = false) => {
+      const sourceTabUrl = sourceTabRef.current.sourceTabUrl?.trim();
+
+      if (sourceTabUrl) {
+        if (!force && getValues('url').trim()) {
+          return;
+        }
+
+        const unsupportedReason = getUnsupportedTabReason(sourceTabUrl);
+        if (unsupportedReason) {
+          setCurrentTabMessage(unsupportedReason);
+          return;
+        }
+
+        const normalizedUrl = normalizeHttpUrl(sourceTabUrl);
+        if (!normalizedUrl) {
+          setCurrentTabMessage('현재 탭 주소 형식이 지원되지 않습니다. 직접 입력해 주세요.');
+          return;
+        }
+
+        setCurrentTabMessage(null);
+        setValue('url', normalizedUrl, {
+          shouldDirty: force,
+          shouldValidate: true,
+        });
+        return;
+      }
+
       if (typeof chrome === 'undefined' || !chrome.tabs?.query) {
         return;
       }
@@ -165,10 +222,11 @@ export default function AddLinkPanel() {
       const shownOnPage = await showCurrentPageToast(message, 'success', {
         actionLabel: '요약 확인',
         actionUrl: appUrl('/all-link'),
+        sourceTabId: sourceTabRef.current.sourceTabId,
       });
 
       if (shownOnPage) {
-        window.close();
+        closeExtensionPanel();
         return;
       }
 
@@ -207,7 +265,7 @@ export default function AddLinkPanel() {
           imageUrl: metaData?.image?.trim() || undefined,
         });
         await qc.invalidateQueries({ queryKey: ['links'], exact: false });
-        await handleSaveSuccess('기존 링크를 덮어썼습니다. 요약 생성을 시작합니다.');
+        await handleSaveSuccess('링크가 저장되었습니다. 요약 생성을 시작합니다.');
       } catch {
         showToast({
           message: '링크 덮어쓰기에 실패했습니다. 다시 시도해 주세요.',
@@ -251,7 +309,7 @@ export default function AddLinkPanel() {
   };
 
   const handleClose = () => {
-    window.close();
+    closeExtensionPanel();
   };
 
   return (
@@ -259,10 +317,10 @@ export default function AddLinkPanel() {
       <header className="border-gray100 flex h-16 items-center justify-between border-b px-6">
         <button
           type="button"
-          className="font-label-md text-gray500 flex items-center gap-2"
+          className="font-label-sm text-gray500 flex items-center gap-2"
           onClick={handleOpenHome}
         >
-          <SVGIcon icon="IC_Home" size="xl" aria-hidden />
+          <SVGIcon icon="IC_Home" size="xxs" aria-hidden />
           <span>내 홈으로 이동</span>
         </button>
         <button
@@ -271,7 +329,7 @@ export default function AddLinkPanel() {
           aria-label="닫기"
           onClick={handleClose}
         >
-          <SVGIcon icon="IC_Close" size="xl" aria-hidden />
+          <SVGIcon icon="IC_Close" size="xs" aria-hidden />
         </button>
       </header>
       <form
@@ -284,7 +342,7 @@ export default function AddLinkPanel() {
           <section className="border-gray100 border-b px-6 py-7">
             <h1 className="font-title-md mb-7 text-[1.375rem] text-gray900">새 링크 추가</h1>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="url-input" className="text-gray900">
+              <Label htmlFor="url-input" textSize="sm" className="text-gray900">
                 링크 주소
               </Label>
               {currentTabMessage ? (
@@ -333,7 +391,7 @@ export default function AddLinkPanel() {
         />
 
         <section className="px-6 py-6">
-          <Label htmlFor="memo-input" className="mb-3 block text-gray900">
+          <Label htmlFor="memo-input" textSize="sm" className="mb-3 block text-gray900">
             메모
           </Label>
           <Controller
@@ -362,16 +420,17 @@ export default function AddLinkPanel() {
               type="button"
               variant="secondary"
               label="기존 링크 유지"
+              size="md"
               className="w-full rounded-lg"
-              onClick={() => reset({ url: '', title: '', memo: '' })}
+              onClick={() => void handleSaveSuccess('기존에 저장한 링크 정보를 유지합니다.')}
             />
           ) : null}
           <Button
             type="submit"
             label={isSubmitting ? '저장 중...' : isDuplicate ? '새로 덮어쓰기' : '저장하기'}
             disabled={displayMetaLoading || isSubmitting}
-            size="lg"
-            className="h-12 w-full rounded-lg bg-gray900 text-white hover:bg-gray800"
+            size="md"
+            className="w-full rounded-lg bg-gray900 text-white hover:bg-gray800"
           />
         </div>
       </form>
