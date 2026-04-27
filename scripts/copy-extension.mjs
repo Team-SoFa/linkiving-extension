@@ -18,7 +18,9 @@ const extensionDir = join(root, 'extension');
 const manifestPath = join(outDir, 'manifest.json');
 mkdirSync(outDir, { recursive: true });
 
-if (existsSync(staticDir) && !existsSync(nextDir)) {
+if (existsSync(staticDir)) {
+  rmSync(join(outDir, 'next'), { recursive: true, force: true });
+  mkdirSync(dirname(nextDir), { recursive: true });
   cpSync(staticDir, nextDir, { recursive: true });
 }
 
