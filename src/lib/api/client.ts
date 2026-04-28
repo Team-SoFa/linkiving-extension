@@ -3,6 +3,8 @@ import { resolveExtensionAccessToken } from '@/lib/chrome/auth';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_EXTENSION_API_BASE_URL ?? process.env.NEXT_PUBLIC_BASE_API_URL;
+const LOGIN_REQUIRED_MESSAGE =
+  '로그인이 필요합니다. Linkiving 웹사이트에 로그인한 뒤 다시 시도해 주세요.';
 
 function joinUrl(baseUrl: string, endpoint: string) {
   if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
@@ -38,7 +40,7 @@ export async function backendApiClient<T>(
 
   headers.set('Content-Type', 'application/json');
   if (!token) {
-    throw createFetchError('로그인이 필요합니다. Linkiving 웹사이트에 로그인한 뒤 다시 시도해 주세요.', {
+    throw createFetchError(LOGIN_REQUIRED_MESSAGE, {
       status: 401,
     });
   }
@@ -58,6 +60,12 @@ export async function backendApiClient<T>(
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw createFetchError(LOGIN_REQUIRED_MESSAGE, {
+          status: response.status,
+        });
+      }
+
       const contentType = response.headers.get('content-type');
       const rawBody = await response.text();
 

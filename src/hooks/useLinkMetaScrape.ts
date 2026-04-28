@@ -140,6 +140,12 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
               return;
             }
 
+            if (error.status === 401) {
+              setMetaErrorMessage(error.message);
+              setMetaLoading(false);
+              return;
+            }
+
             setMetaErrorMessage(
               `메타 정보를 가져오지 못했습니다. (status: ${error.status ?? 'unknown'})`
             );
