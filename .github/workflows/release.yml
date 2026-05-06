@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package extension
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_EXTENSION_API_BASE_URL: ${{ vars.NEXT_PUBLIC_EXTENSION_API_BASE_URL || 'https://api.linkiving.com' }}
+      NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL: ${{ vars.NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL || 'https://linkiving.com' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        run: pnpm lint
+
+      - name: Run typecheck
+        run: pnpm typecheck
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Verify extension build output
+        run: |
+          test -d out
+          test -f out/manifest.json
+          test -f out/unsupported-popup.html
+          test -f out/background.js
+          test -d out/icons
+          test -f out/icons/icon-16.png
+          test -f out/icons/icon-32.png
+          test -f out/icons/icon-48.png
+          test -f out/icons/icon-128.png
+
+      - name: Create release zip
+        id: package
+        run: |
+          asset_name="linkiving-extension-${GITHUB_REF_NAME}.zip"
+          asset_path="${GITHUB_WORKSPACE}/${asset_name}"
+
+          cd out
+          zip -r "${asset_path}" .
+
+          echo "asset_name=${asset_name}" >> "${GITHUB_OUTPUT}"
+          echo "asset_path=${asset_path}" >> "${GITHUB_OUTPUT}"
+
+      - name: Prepare release notes from changelog
+        id: release_notes
+        run: |
+          notes_path="${RUNNER_TEMP}/release-notes.md"
+
+          if [ -f CHANGELOG.md ]; then
+            awk -v tag="${GITHUB_REF_NAME}" '
+              BEGIN {
+                found = 0
+                version = tag
+                sub(/^v/, "", version)
+              }
+              $0 ~ "^##[[:space:]]+" {
+                if (found) {
+                  exit
+                }
+
+                heading = $0
+                sub(/^##[[:space:]]+/, "", heading)
+                sub(/^\[/, "", heading)
+                sub(/\].*/, "", heading)
+                split(heading, parts, /[[:space:]]+/)
+
+                if (parts[1] == tag || parts[1] == version) {
+                  found = 1
+                  next
+                }
+              }
+              found { print }
+            ' CHANGELOG.md > "${notes_path}"
+          fi
+
+          if [ -s "${notes_path}" ]; then
+            echo "has_notes=true" >> "${GITHUB_OUTPUT}"
+            echo "notes_path=${notes_path}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_notes=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Upload zip to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_PATH: ${{ steps.package.outputs.asset_path }}
+          HAS_NOTES: ${{ steps.release_notes.outputs.has_notes }}
+          NOTES_PATH: ${{ steps.release_notes.outputs.notes_path }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            if [ "${HAS_NOTES}" = "true" ]; then
+              gh release edit "${GITHUB_REF_NAME}" --notes-file "${NOTES_PATH}"
+            fi
+            gh release upload "${GITHUB_REF_NAME}" "${ASSET_PATH}" --clobber
+          else
+            if [ "${HAS_NOTES}" = "true" ]; then
+              gh release create "${GITHUB_REF_NAME}" "${ASSET_PATH}" --title "${GITHUB_REF_NAME}" --notes-file "${NOTES_PATH}"
+            else
+              gh release create "${GITHUB_REF_NAME}" "${ASSET_PATH}" --title "${GITHUB_REF_NAME}" --generate-notes
+            fi
+          fi
