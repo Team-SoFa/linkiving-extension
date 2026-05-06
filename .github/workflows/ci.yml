@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate extension
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_EXTENSION_API_BASE_URL: ${{ vars.NEXT_PUBLIC_EXTENSION_API_BASE_URL || 'https://api.linkiving.com' }}
+      NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL: ${{ vars.NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL || 'https://linkiving.com' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        run: pnpm lint
+
+      - name: Run typecheck
+        run: pnpm typecheck
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Verify extension build output
+        run: |
+          test -d out
+          test -f out/manifest.json
+          test -f out/unsupported-popup.html
+          test -f out/background.js
+          test -d out/icons
+          test -f out/icons/icon-16.png
+          test -f out/icons/icon-32.png
+          test -f out/icons/icon-48.png
+          test -f out/icons/icon-128.png
