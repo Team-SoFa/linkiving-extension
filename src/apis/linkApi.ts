@@ -1,4 +1,5 @@
 import { backendApiClient } from '@/lib/api/client';
+import { withAnalyticsContext } from '@/lib/client/analytics';
 import type {
   DuplicateLinkApiResponse,
   LinkApiData,
@@ -31,9 +32,10 @@ const normalizeLink = (data: LinkApiData) => {
 };
 
 export const createLink = async (payload: CreateLinkPayload): Promise<Link> => {
+  const analyticsPayload = await withAnalyticsContext(payload);
   const body = await backendApiClient<LinkApiResponse>('/v1/links', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(analyticsPayload),
   });
 
   if (!body?.data || !body.success) {
