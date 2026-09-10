@@ -31,6 +31,7 @@ NEXT_PUBLIC_EXTENSION_API_TOKEN=
 - 익스텐션은 Linkiving 웹사이트의 `accessToken` 쿠키를 먼저 읽어 로그인 상태를 재사용합니다.
 - `NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL`을 설정하면 기본값인 `https://linkiving.com` 대신 해당 사이트의 쿠키도 조회합니다.
 - 쿠키 재사용 방식을 쓰려면 Chrome 확장 권한에서 `cookies`와 해당 도메인 host permission이 필요합니다.
+- 기본 manifest는 운영 API와 인증 도메인만 host permission으로 허용합니다. 로컬 또는 별도 환경을 사용하려면 해당 origin을 `extension/manifest.json`에 명시적으로 추가해야 합니다.
 - `NEXT_PUBLIC_EXTENSION_API_TOKEN`은 쿠키가 없을 때 로컬 개발에서만 사용하는 fallback이며 프로덕션 빌드에서는 허용되지 않습니다.
 - 개발용 fallback에는 최소 권한·짧은 만료 토큰만 사용해야 합니다. `NEXT_PUBLIC_*` 값은 빌드 결과물에 포함되므로 서버 전용 비밀값을 넣으면 안 됩니다.
 - 백엔드는 `chrome-extension://<extension-id>` 오리진에 대해 CORS 허용이 되어 있어야 합니다.
@@ -58,6 +59,15 @@ pnpm version:check
 - `src/apis`, `src/hooks`, `src/lib`: 익스텐션에서 직접 백엔드 호출하도록 바꾼 클라이언트 로직
 - `extension/manifest.json`: Chrome Extension 매니페스트 원본. 빌드 시 `out/`으로 복사됩니다.
 - `scripts/copy-extension.mjs`: `next export` 산출물과 `extension/manifest.json`을 합쳐 익스텐션 로드용 `out/` 구조로 정리하는 스크립트
+
+## 확장 권한
+
+- `activeTab`, `scripting`: 사용자가 확장 아이콘을 누른 현재 페이지에 오버레이와 저장 완료 토스트를 주입합니다.
+- `tabs`: 활성 탭 변경에 따라 지원하지 않는 페이지용 팝업을 전환하고 최근 웹 탭을 찾습니다.
+- `cookies`: Linkiving 웹 로그인 쿠키를 읽어 사용자 인증을 재사용합니다.
+- `storage`: 설치별 GA client ID를 로컬에 보관합니다.
+- host permission은 Linkiving 운영 웹/API 도메인의 쿠키 조회와 API 요청에만 사용합니다.
+- `index.html`만 모든 사이트에서 iframe으로 표시할 수 있도록 web accessible resource로 공개합니다.
 
 ## 현재 동작
 
