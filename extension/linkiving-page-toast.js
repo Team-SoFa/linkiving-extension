@@ -1,6 +1,6 @@
 (function () {
   const MESSAGE_TYPE = 'LINKIVING_SHOW_PAGE_TOAST';
-  const CONTAINER_ID = 'linkiving-page-toast-root';
+  const CONTAINER_ID = `linkiving-page-toast-root-${chrome.runtime.id}`;
   const TOAST_DURATION_MS = 5000;
   const FADE_DURATION_MS = 300;
 
@@ -160,6 +160,9 @@
 
     const list = document.createElement('div');
     list.setAttribute('data-linkiving-toast-list', '');
+    list.setAttribute('role', 'status');
+    list.setAttribute('aria-live', 'polite');
+    list.setAttribute('aria-atomic', 'false');
 
     root.appendChild(list);
     shadow.append(style, root);
@@ -251,8 +254,8 @@
     chrome.runtime.onMessage.removeListener(window.__LINKIVING_PAGE_TOAST_HANDLER__);
   }
 
-  window.__LINKIVING_PAGE_TOAST_HANDLER__ = (message, _sender, sendResponse) => {
-    if (message && message.type === MESSAGE_TYPE) {
+  window.__LINKIVING_PAGE_TOAST_HANDLER__ = (message, sender, sendResponse) => {
+    if (sender.id === chrome.runtime.id && message && message.type === MESSAGE_TYPE) {
       showToast(message.message, message.variant, message.actionLabel, message.actionUrl);
       sendResponse({ ok: true });
     }
