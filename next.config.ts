@@ -39,6 +39,24 @@ loadFallbackEnvFile('.env.local');
 loadFallbackEnvFile('.env_local');
 
 const isProd = process.env.NODE_ENV === 'production';
+const forbiddenClientTokenVariables = [
+  'NEXT_PUBLIC_EXTENSION_API_TOKEN',
+  'NEXT_PUBLIC_API_TOKEN',
+] as const;
+
+if (isProd) {
+  const configuredTokenVariable = forbiddenClientTokenVariables.find(name =>
+    process.env[name]?.trim()
+  );
+
+  if (configuredTokenVariable) {
+    throw new Error(
+      `${configuredTokenVariable} must not be set for a production extension build. ` +
+        'Client-side extension bundles cannot keep API tokens secret.'
+    );
+  }
+}
+
 type SvgRuleCandidate = {
   test?: RegExp;
   exclude?: RegExp;

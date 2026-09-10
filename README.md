@@ -21,7 +21,6 @@ Chrome에서 `chrome://extensions`로 이동한 뒤 `압축해제된 확장 프�
 ```bash
 NEXT_PUBLIC_EXTENSION_API_BASE_URL=https://api.example.com
 NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL=https://linkiving.example.com
-NEXT_PUBLIC_EXTENSION_API_TOKEN=
 ```
 
 - 권장 파일명은 `.env.local`입니다.
@@ -31,8 +30,8 @@ NEXT_PUBLIC_EXTENSION_API_TOKEN=
 - 익스텐션은 Linkiving 웹사이트의 `accessToken` 쿠키를 먼저 읽어 로그인 상태를 재사용합니다.
 - `NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL`을 설정하면 기본값인 `https://linkiving.com` 대신 해당 사이트의 쿠키도 조회합니다.
 - 쿠키 재사용 방식을 쓰려면 Chrome 확장 권한에서 `cookies`와 해당 도메인 host permission이 필요합니다.
-- `NEXT_PUBLIC_EXTENSION_API_TOKEN`은 쿠키가 없을 때만 사용하는 개발용 fallback입니다.
-- `NEXT_PUBLIC_*` 값은 빌드 결과물에 포함되므로 서버 전용 비밀값을 넣으면 안 됩니다.
+- 익스텐션은 사용자별 로그인 쿠키로만 인증하며 정적 API 토큰을 지원하지 않습니다.
+- `NEXT_PUBLIC_*` 값은 빌드 결과물에 포함되므로 인증 토큰이나 서버 전용 비밀값을 넣으면 안 됩니다.
 - 백엔드는 `chrome-extension://<extension-id>` 오리진에 대해 CORS 허용이 되어 있어야 합니다.
 
 ## 스크립트
