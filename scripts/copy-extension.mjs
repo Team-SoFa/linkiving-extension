@@ -10,6 +10,8 @@ import {
 } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 
+import { getPackageVersion } from './extension-version.mjs';
+
 const root = process.cwd();
 const outDir = join(root, 'out');
 const nextDir = join(outDir, 'next', '_next');
@@ -164,6 +166,7 @@ function normalizeManifest() {
   if (!existsSync(manifestPath)) return;
 
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  manifest.version = getPackageVersion(root);
   delete manifest.content_security_policy;
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 }

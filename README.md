@@ -43,7 +43,13 @@ pnpm build
 pnpm start
 pnpm lint
 pnpm typecheck
+pnpm version:sync
+pnpm version:check
 ```
+
+`package.json`의 `version`을 릴리스 버전의 기준으로 사용합니다. 버전을 변경한 뒤
+`pnpm version:sync`를 실행하면 원본 manifest가 동기화되며, 릴리스에서는 태그와 빌드
+산출물의 버전까지 자동으로 검증합니다.
 
 ## 구조
 

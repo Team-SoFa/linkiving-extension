@@ -6,10 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "pnpm version:sync",
     "build": "next build --webpack && node scripts/copy-extension.mjs",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "version:sync": "node scripts/sync-extension-version.mjs",
+    "version:check": "node scripts/verify-extension-version.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

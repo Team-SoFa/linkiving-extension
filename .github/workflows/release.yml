@@ -35,6 +35,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Synchronize and verify release version
+        run: |
+          pnpm version:sync
+          node scripts/verify-extension-version.mjs "${GITHUB_REF_NAME}"
+
       - name: Run lint
         run: pnpm lint
 
@@ -43,6 +48,9 @@ jobs:
 
       - name: Build extension
         run: pnpm build
+
+      - name: Verify packaged extension version
+        run: node scripts/verify-extension-version.mjs "${GITHUB_REF_NAME}" out/manifest.json
 
       - name: Verify extension build output
         run: |
