@@ -1,8 +1,5 @@
 import { ACCESS_TOKEN_COOKIE_NAME } from '@/lib/constants/auth';
 
-const explicitToken =
-  process.env.NEXT_PUBLIC_EXTENSION_API_TOKEN ?? process.env.NEXT_PUBLIC_API_TOKEN;
-
 const authBaseUrls = [
   process.env.NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL,
   process.env.NEXT_PUBLIC_EXTENSION_APP_URL,
@@ -55,10 +52,6 @@ export async function resolveExtensionAccessToken() {
     if (token) {
       return token;
     }
-  }
-
-  if (explicitToken?.trim()) {
-    return explicitToken.trim();
   }
 
   return null;
