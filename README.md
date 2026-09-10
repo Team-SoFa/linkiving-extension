@@ -46,6 +46,8 @@ pnpm lint
 pnpm typecheck
 pnpm version:sync
 pnpm version:check
+pnpm test
+pnpm verify:extension
 ```
 
 `package.json`의 `version`을 릴리스 버전의 기준으로 사용합니다. 버전을 변경한 뒤

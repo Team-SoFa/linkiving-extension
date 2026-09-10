@@ -12,7 +12,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "version:sync": "node scripts/sync-extension-version.mjs",
-    "version:check": "node scripts/verify-extension-version.mjs"
+    "version:check": "node scripts/verify-extension-version.mjs",
+    "test": "vitest run",
+    "verify:extension": "node scripts/verify-extension-build.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -39,6 +41,7 @@
     "eslint": "^9.32.0",
     "eslint-config-next": "15.3.0",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
