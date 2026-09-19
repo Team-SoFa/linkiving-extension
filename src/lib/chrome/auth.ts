@@ -1,5 +1,10 @@
 import { ACCESS_TOKEN_COOKIE_NAME } from '@/lib/constants/auth';
 
+const developmentFallbackToken =
+  process.env.NODE_ENV !== 'production'
+    ? (process.env.NEXT_PUBLIC_EXTENSION_API_TOKEN ?? process.env.NEXT_PUBLIC_API_TOKEN)
+    : undefined;
+
 const authBaseUrls = [
   process.env.NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL,
   process.env.NEXT_PUBLIC_EXTENSION_APP_URL,
@@ -52,6 +57,10 @@ export async function resolveExtensionAccessToken() {
     if (token) {
       return token;
     }
+  }
+
+  if (developmentFallbackToken?.trim()) {
+    return developmentFallbackToken.trim();
   }
 
   return null;
