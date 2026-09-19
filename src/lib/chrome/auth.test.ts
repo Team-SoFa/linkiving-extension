@@ -28,6 +28,26 @@ describe('resolveExtensionAccessToken', () => {
     await expect(resolveExtensionAccessToken()).resolves.toBeNull();
   });
 
+  it('uses the explicit fallback token only during local development', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_EXTENSION_API_TOKEN', ' development-token ');
+    vi.stubGlobal('chrome', { cookies: { get: vi.fn().mockResolvedValue(null) } });
+
+    const { resolveExtensionAccessToken } = await import('./auth');
+
+    await expect(resolveExtensionAccessToken()).resolves.toBe('development-token');
+  });
+
+  it('ignores the explicit fallback token in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_EXTENSION_API_TOKEN', 'production-token');
+    vi.stubGlobal('chrome', { cookies: { get: vi.fn().mockResolvedValue(null) } });
+
+    const { resolveExtensionAccessToken } = await import('./auth');
+
+    await expect(resolveExtensionAccessToken()).resolves.toBeNull();
+  });
+
   it('checks a configured auth origin before the default origin', async () => {
     vi.stubEnv('NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL', 'https://preview.linkiving.test/path');
     const get = vi
