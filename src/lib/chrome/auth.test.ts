@@ -48,20 +48,16 @@ describe('resolveExtensionAccessToken', () => {
     await expect(resolveExtensionAccessToken()).resolves.toBeNull();
   });
 
-  it('checks a configured auth origin before the default origin', async () => {
+  it('does not reuse a production login when an explicit auth site is configured', async () => {
     vi.stubEnv('NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL', 'https://preview.linkiving.test/path');
-    const get = vi
-      .fn()
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ value: 'default-token' });
+    const get = vi.fn().mockResolvedValue(null);
     vi.stubGlobal('chrome', { cookies: { get } });
 
     const { resolveExtensionAccessToken } = await import('./auth');
 
-    await expect(resolveExtensionAccessToken()).resolves.toBe('default-token');
+    await expect(resolveExtensionAccessToken()).resolves.toBeNull();
     expect(get.mock.calls.map(([details]) => details.url)).toEqual([
       'https://preview.linkiving.test',
-      'https://linkiving.com',
     ]);
   });
 });

@@ -28,11 +28,11 @@ export default function LinkThumbnailTitleSection({
   label = '링크 정보',
 }: Props) {
   return (
-    <section className="border-gray100 border-b px-6 py-6">
-      <Label textSize="sm" className="mb-3 block text-gray900">
+    <section className="border-gray100 border-b px-6 py-4">
+      <Label textSize="sm" className="mb-2 block text-gray900">
         {label}
       </Label>
-      <div className="grid grid-cols-[10rem_minmax(0,1fr)] gap-2">
+      <div className="grid grid-cols-[minmax(5rem,1fr)_minmax(0,3fr)] gap-2">
         <div
           className={`border-gray100 relative h-[5rem] overflow-hidden rounded-lg border bg-white ${
             shouldDisableDetails ? 'opacity-60' : ''
