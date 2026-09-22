@@ -1,6 +1,6 @@
 import { useLinkMetaScrape } from '@/hooks/useLinkMetaScrape';
 import { MAX_MEMO_LENGTH, MAX_TITLE_LENGTH } from '@/lib/constants/link';
-import { getReadableUrlLabel, normalizeHttpUrl } from '@/lib/url';
+import { normalizeHttpUrl } from '@/lib/url';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -36,6 +36,7 @@ export function useAddLinkForm() {
     control,
     setValue,
     getValues,
+    setFocus,
     formState: { dirtyFields },
   } = form;
 
@@ -57,25 +58,10 @@ export function useAddLinkForm() {
   });
 
   useEffect(() => {
-    if (!normalizedUrl || dirtyFields.title || metaLoading) {
-      return;
+    if (metaErrorMessage && !metaLoading) {
+      setFocus('title');
     }
-
-    const currentTitle = (getValues('title') ?? '').trim();
-    if (currentTitle) {
-      return;
-    }
-
-    const metaTitle = metaData?.title?.trim();
-    if (metaTitle) {
-      return;
-    }
-
-    setValue('title', getReadableUrlLabel(normalizedUrl), {
-      shouldValidate: true,
-      shouldDirty: false,
-    });
-  }, [normalizedUrl, dirtyFields.title, metaLoading, getValues, metaData?.title, setValue]);
+  }, [metaErrorMessage, metaLoading, setFocus]);
 
   const shouldDisableDetails = !trimmedUrl || !isValidUrl || metaLoading;
   const previewImageUrl = metaData?.image?.trim()
