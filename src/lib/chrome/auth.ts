@@ -5,13 +5,17 @@ const developmentFallbackToken =
     ? (process.env.NEXT_PUBLIC_EXTENSION_API_TOKEN ?? process.env.NEXT_PUBLIC_API_TOKEN)
     : undefined;
 
-const authBaseUrls = [
-  process.env.NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL,
-  process.env.NEXT_PUBLIC_EXTENSION_APP_URL,
-  'https://linkiving.com',
-  process.env.NEXT_PUBLIC_EXTENSION_API_BASE_URL,
-  process.env.NEXT_PUBLIC_BASE_API_URL,
-].filter((value): value is string => Boolean(value));
+const configuredAuthUrl =
+  process.env.NEXT_PUBLIC_EXTENSION_AUTH_BASE_URL?.trim() ||
+  process.env.NEXT_PUBLIC_EXTENSION_APP_URL?.trim();
+const authBaseUrls = (configuredAuthUrl
+  ? [configuredAuthUrl]
+  : [
+      'https://linkiving.com',
+      process.env.NEXT_PUBLIC_EXTENSION_API_BASE_URL,
+      process.env.NEXT_PUBLIC_BASE_API_URL,
+    ]
+).filter((value): value is string => Boolean(value));
 
 function toOrigin(url: string) {
   try {

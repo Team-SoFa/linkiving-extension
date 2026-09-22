@@ -8,8 +8,19 @@ declare namespace chrome {
 
   namespace cookies {
     interface Cookie {
+      name?: string;
       value?: string;
     }
+
+    interface CookieChangeInfo {
+      cookie: Cookie;
+      removed: boolean;
+    }
+
+    const onChanged: {
+      addListener(callback: (change: CookieChangeInfo) => void): void;
+      removeListener(callback: (change: CookieChangeInfo) => void): void;
+    };
 
     function get(details: { url: string; name: string }): Promise<Cookie | null>;
   }
