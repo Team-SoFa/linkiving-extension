@@ -421,9 +421,6 @@ export default function AddLinkPanel() {
                   />
                 )}
               />
-              {metaErrorMessage ? (
-                <span className="text-red500 text-xs">{metaErrorMessage}</span>
-              ) : null}
             </div>
           </section>
         )}
@@ -476,7 +473,7 @@ export default function AddLinkPanel() {
           <Button
             type="submit"
             label={isSubmitting ? '저장 중...' : isDuplicate ? '새로 덮어쓰기' : '저장하기'}
-            disabled={displayMetaLoading || isSubmitting}
+            disabled={!isValidUrl || !titleValue?.trim() || displayMetaLoading || isSubmitting}
             size="md"
             className="w-full rounded-lg bg-gray900 text-white hover:bg-gray800"
           />
