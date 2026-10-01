@@ -2,6 +2,7 @@
   const LINKIVING_OVERLAY_ID = `linkiving-extension-overlay-root-${chrome.runtime.id}`;
   const LINKIVING_OVERLAY_MESSAGE_TYPE = 'LINKIVING_TOGGLE_OVERLAY';
   const LINKIVING_CLOSE_MESSAGE_TYPE = 'LINKIVING_CLOSE_OVERLAY';
+  const LINKIVING_RESIZE_MESSAGE_TYPE = 'LINKIVING_RESIZE_OVERLAY';
   const EXTENSION_ORIGIN = new URL(chrome.runtime.getURL('/')).origin;
   let activeIframe = null;
 
@@ -73,12 +74,13 @@
     });
 
     window.addEventListener('message', event => {
-      if (
-        event.origin === EXTENSION_ORIGIN &&
-        event.source === activeIframe?.contentWindow &&
-        event.data?.type === LINKIVING_CLOSE_MESSAGE_TYPE
-      ) {
+      if (event.origin !== EXTENSION_ORIGIN || event.source !== activeIframe?.contentWindow) return;
+      if (event.data?.type === LINKIVING_CLOSE_MESSAGE_TYPE) {
         removeLinkivingOverlay();
+      } else if (event.data?.type === LINKIVING_RESIZE_MESSAGE_TYPE && Number.isFinite(event.data.height)) {
+        const height = Math.min(660, Math.max(160, Math.ceil(event.data.height)));
+        const root = document.getElementById(LINKIVING_OVERLAY_ID);
+        if (root) root.style.height = `min(${height}px, calc(100vh - 8px))`;
       }
     });
   }

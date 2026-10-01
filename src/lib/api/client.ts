@@ -1,5 +1,6 @@
 import { createFetchError } from './errors';
 import { resolveExtensionAccessToken } from '@/lib/chrome/auth';
+import { requireExtensionLogin } from '@/stores/extensionAuthStore';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_EXTENSION_API_BASE_URL ?? process.env.NEXT_PUBLIC_BASE_API_URL;
@@ -33,13 +34,12 @@ export async function backendApiClient<T>(
   }
 
   const { timeout = 15_000, ...fetchOptions } = options;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
   const headers = new Headers(fetchOptions.headers ?? {});
   const token = await resolveExtensionAccessToken();
 
   headers.set('Content-Type', 'application/json');
   if (!token) {
+    requireExtensionLogin(false);
     throw createFetchError(LOGIN_REQUIRED_MESSAGE, {
       status: 401,
     });
@@ -50,17 +50,24 @@ export async function backendApiClient<T>(
   }
 
   const url = joinUrl(API_BASE_URL, endpoint);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
     const response = await fetch(url, {
       ...fetchOptions,
       headers,
-      signal: fetchOptions.signal ?? controller.signal,
+      signal: fetchOptions.signal
+        ? AbortSignal.any([fetchOptions.signal, controller.signal])
+        : controller.signal,
       cache: 'no-store',
     });
 
     if (!response.ok) {
       if (response.status === 401) {
+        if (!fetchOptions.signal?.aborted && (await resolveExtensionAccessToken()) === token) {
+          requireExtensionLogin(true);
+        }
         throw createFetchError(LOGIN_REQUIRED_MESSAGE, {
           status: response.status,
         });

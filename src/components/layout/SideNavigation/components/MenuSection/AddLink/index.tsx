@@ -6,10 +6,11 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { updateLink } from '@/apis/linkApi';
 import Button from '@/components/basics/Button/Button';
-import SVGIcon from '@/components/Icons/SVGIcon';
 import Label from '@/components/basics/Label/Label';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import { usePostLinks } from '@/hooks/usePostLinks';
+import { appUrl, closeExtensionPanel } from '@/lib/chrome/navigation';
+import { FetchError } from '@/lib/api/errors';
 import { showCurrentPageToast } from '@/lib/chrome/pageToast';
 import { MAX_MEMO_LENGTH } from '@/lib/constants/link';
 import { getUnsupportedTabReason, normalizeHttpUrl } from '@/lib/url';
@@ -21,13 +22,6 @@ import { useAddLinkForm } from './hooks/useAddLinkForm';
 import { useCreateLinkError } from './hooks/useCreateLinkError';
 import { useDuplicateCheck } from './hooks/useDuplicateCheck';
 import LinkThumbnailTitleSection from './LinkThumbnailTitleSection';
-
-const DEFAULT_APP_URL = 'https://linkiving.com';
-const APP_BASE_URL = process.env.NEXT_PUBLIC_EXTENSION_APP_URL ?? DEFAULT_APP_URL;
-
-function appUrl(path = '') {
-  return `${APP_BASE_URL.replace(/\/$/, '')}${path}`;
-}
 
 function getPopupSourceTab() {
   if (typeof window === 'undefined') {
@@ -43,19 +37,6 @@ function getPopupSourceTab() {
     sourceTabUrl,
     sourceTabId: Number.isFinite(sourceTabId) ? sourceTabId : null,
   };
-}
-
-function closeExtensionPanel() {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  if (window.parent && window.parent !== window) {
-    window.parent.postMessage({ type: 'LINKIVING_CLOSE_OVERLAY' }, '*');
-    return;
-  }
-
-  window.close();
 }
 
 function getHttpTabUrl(tab: chrome.tabs.Tab | undefined) {
@@ -314,7 +295,8 @@ export default function AddLinkPanel() {
         });
         await qc.invalidateQueries({ queryKey: ['links'], exact: false });
         await handleSaveSuccess('링크가 저장되었습니다. 요약 생성을 시작합니다.');
-      } catch {
+      } catch (error) {
+        if (error instanceof FetchError && error.status === 401) return;
         showToast({
           message: '링크 덮어쓰기에 실패했습니다. 다시 시도해 주세요.',
           variant: 'error',
@@ -352,34 +334,8 @@ export default function AddLinkPanel() {
     });
   };
 
-  const handleOpenHome = () => {
-    window.open(appUrl(), '_blank', 'noopener,noreferrer');
-  };
-
-  const handleClose = () => {
-    closeExtensionPanel();
-  };
-
   return (
-    <div className="flex flex-col overflow-hidden bg-gray50">
-      <header className="border-gray100 flex h-16 items-center justify-between border-b px-6">
-        <button
-          type="button"
-          className="font-label-sm text-gray500 flex items-center gap-2"
-          onClick={handleOpenHome}
-        >
-          <SVGIcon icon="IC_Home" size="xxs" aria-hidden />
-          <span>내 홈으로 이동</span>
-        </button>
-        <button
-          type="button"
-          className="text-gray500 hover:text-gray800 flex h-10 w-10 items-center justify-center rounded-lg"
-          aria-label="닫기"
-          onClick={handleClose}
-        >
-          <SVGIcon icon="IC_Close" size="xs" aria-hidden />
-        </button>
-      </header>
+    <div className="flex shrink-0 flex-col bg-gray50">
       <form
         onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
         className={`flex flex-col ${hasSubmitError ? 'border-red500' : 'border-transparent'}`}
@@ -387,9 +343,9 @@ export default function AddLinkPanel() {
         {isDuplicate ? (
           <DuplicateBanner />
         ) : (
-          <section className="border-gray100 border-b px-6 py-7">
-            <h1 className="font-title-md mb-7 text-[1.375rem] text-gray900">새 링크 추가</h1>
-            <div className="flex flex-col gap-3">
+          <section className="border-gray100 border-b px-6 py-4">
+            <h1 className="font-title-md mb-4 text-[1.375rem] text-gray900">새 링크 추가</h1>
+            <div className="flex flex-col gap-2">
               <Label htmlFor="url-input" textSize="sm" className="text-gray900">
                 링크 주소
               </Label>
@@ -438,8 +394,8 @@ export default function AddLinkPanel() {
           label={isDuplicate ? '기존 링크 정보' : '링크 정보'}
         />
 
-        <section className="px-6 py-6">
-          <Label htmlFor="memo-input" textSize="sm" className="mb-3 block text-gray900">
+        <section className="px-6 py-4">
+          <Label htmlFor="memo-input" textSize="sm" className="mb-2 block text-gray900">
             메모
           </Label>
           <Controller
@@ -450,19 +406,20 @@ export default function AddLinkPanel() {
                 {...field}
                 id="memo-input"
                 placeholder="메모를 입력해 주세요."
-                heightLines={3}
+                heightLines={2}
+                maxHeightLines={2}
                 maxLength={MAX_MEMO_LENGTH}
                 isLoading={displayMetaLoading && isValidUrl}
                 disabled={displayShouldDisableDetails}
                 value={field.value ?? ''}
                 onChange={e => field.onChange(e)}
-                className="border-gray100 min-h-[5rem] bg-white"
+                className="border-gray100 min-h-[4rem] bg-white"
               />
             )}
           />
         </section>
 
-        <div className={`px-6 pb-6 ${isDuplicate && duplicateLinkId ? 'grid grid-cols-2 gap-2' : ''}`}>
+        <div className={`px-6 pb-4 ${isDuplicate && duplicateLinkId ? 'grid grid-cols-2 gap-2' : ''}`}>
           {isDuplicate && duplicateLinkId ? (
             <Button
               type="button"
