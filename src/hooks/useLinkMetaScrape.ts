@@ -9,6 +9,9 @@ import type {
   UseFormSetValue,
 } from 'react-hook-form';
 
+const META_SCRAPE_FAILURE_MESSAGE =
+  '링크 정보를 불러오지 못했습니다. 제목을 직접 입력해 주세요.';
+
 type MetaData = {
   title: string;
   description: string;
@@ -100,16 +103,10 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
         .then(data => {
           if (requestId !== metaRequestId.current) return;
 
-          const isEmptyMeta =
-            !data.title?.trim() &&
-            !data.description?.trim() &&
-            !data.image?.trim() &&
-            !data.url?.trim();
-
           setMetaData(data);
           setMetaLoading(false);
-          if (isEmptyMeta) {
-            setMetaErrorMessage('메타 정보를 가져오지 못했습니다. 제목과 메모를 직접 입력해 주세요.');
+          if (!data.title?.trim()) {
+            setMetaErrorMessage(META_SCRAPE_FAILURE_MESSAGE);
           }
           if (!dirtyTitleRef.current && !skipAutoFillRef.current) {
             setValue(titlePath, (data.title ?? '') as PathValue<T, typeof titlePath>, {
@@ -131,27 +128,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
               body: error.body,
             } : error);
           }
-          if (error instanceof FetchError) {
-            if (error.status === 403) {
-              setMetaErrorMessage(
-                '확장프로그램에서 메타 정보 수집 권한이 거부되었습니다. 백엔드의 확장 오리진 허용 설정을 확인해 주세요.'
-              );
-              setMetaLoading(false);
-              return;
-            }
-
-            if (error.status === 401) {
-              setMetaErrorMessage(error.message);
-              setMetaLoading(false);
-              return;
-            }
-
-            setMetaErrorMessage(
-              `메타 정보를 가져오지 못했습니다. (status: ${error.status ?? 'unknown'})`
-            );
-          } else {
-            setMetaErrorMessage('메타 정보를 가져오지 못했습니다.');
-          }
+          setMetaErrorMessage(META_SCRAPE_FAILURE_MESSAGE);
           setMetaLoading(false);
         });
     }, 500);
