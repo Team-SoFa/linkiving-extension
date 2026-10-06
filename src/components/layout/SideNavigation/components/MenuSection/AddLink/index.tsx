@@ -475,7 +475,7 @@ export default function AddLinkPanel() {
             label={isSubmitting ? '저장 중...' : isDuplicate ? '새로 덮어쓰기' : '저장하기'}
             disabled={!isValidUrl || !titleValue?.trim() || displayMetaLoading || isSubmitting}
             size="md"
-            className="w-full rounded-lg bg-gray900 text-white hover:bg-gray800"
+            className="w-full rounded-lg bg-gray900 text-white enabled:hover:bg-gray800 disabled:border-gray100 disabled:bg-gray100 disabled:text-gray300"
           />
         </div>
       </form>

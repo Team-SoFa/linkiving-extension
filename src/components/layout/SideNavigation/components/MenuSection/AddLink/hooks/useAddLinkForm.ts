@@ -58,10 +58,12 @@ export function useAddLinkForm() {
   });
 
   useEffect(() => {
-    if (metaErrorMessage && !metaLoading) {
-      setFocus('title');
+    if (metaErrorMessage && !metaLoading && !getValues('title').trim()) {
+      // 로딩 스켈레톤이 textarea로 교체되고 폼 ref가 연결된 뒤 포커스합니다.
+      const frame = requestAnimationFrame(() => setFocus('title'));
+      return () => cancelAnimationFrame(frame);
     }
-  }, [metaErrorMessage, metaLoading, setFocus]);
+  }, [metaErrorMessage, metaLoading, getValues, setFocus]);
 
   const shouldDisableDetails = !trimmedUrl || !isValidUrl || metaLoading;
   const previewImageUrl = metaData?.image?.trim()
