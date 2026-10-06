@@ -1,7 +1,7 @@
 import SVGIcon from '@/components/Icons/SVGIcon';
 import { closeExtensionPanel, openLinkiving } from '@/lib/chrome/navigation';
 
-export default function ExtensionHeader() {
+export default function ExtensionHeader({ authenticated = false }: { authenticated?: boolean }) {
   return (
     <header className="border-gray100 flex h-14 shrink-0 items-center justify-between border-b px-6">
       <button
@@ -9,8 +9,8 @@ export default function ExtensionHeader() {
         className="font-label-md text-gray500 flex items-center gap-2 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4"
         onClick={openLinkiving}
       >
-        <SVGIcon icon="IC_LinkOpen" size="xs" aria-hidden />
-        <span>링카이빙 바로가기</span>
+        <SVGIcon icon={authenticated ? 'IC_Home' : 'IC_LinkOpen'} size="xs" aria-hidden />
+        <span>{authenticated ? '내 홈으로 이동' : '링카이빙 바로가기'}</span>
       </button>
       <button
         type="button"
