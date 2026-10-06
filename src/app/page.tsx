@@ -32,7 +32,7 @@ export default function Page() {
         ref={panelRef}
         className="mx-auto flex w-full max-w-[40rem] flex-col rounded-2xl border border-gray100 bg-gray50"
       >
-        <ExtensionHeader />
+        <ExtensionHeader authenticated={authenticated} />
         {authenticated ? (
           <AddLinkPanel />
         ) : (
