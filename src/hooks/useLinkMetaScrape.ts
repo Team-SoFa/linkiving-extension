@@ -72,7 +72,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
       setMetaData(null);
       setMetaErrorMessage(null);
       if (!dirtyTitleRef.current && !skipAutoFillRef.current) {
-        setValue(titlePath, '' as PathValue<T, typeof titlePath>, { shouldValidate: true });
+        setValue(titlePath, '' as PathValue<T, typeof titlePath>, { shouldValidate: false });
       }
       if (!dirtyMemoRef.current && !skipAutoFillRef.current) {
         setValue(memoPath, '' as PathValue<T, typeof memoPath>, { shouldValidate: true });
@@ -86,7 +86,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
     setMetaData(null);
     setMetaErrorMessage(null);
     if (!dirtyFields.title && getValues(titlePath)) {
-      setValue(titlePath, '' as PathValue<T, typeof titlePath>, { shouldValidate: true });
+      setValue(titlePath, '' as PathValue<T, typeof titlePath>, { shouldValidate: false });
     }
     if (!dirtyFields.memo && getValues(memoPath)) {
       setValue(memoPath, '' as PathValue<T, typeof memoPath>, { shouldValidate: true });
@@ -110,7 +110,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
           }
           if (!dirtyTitleRef.current && !skipAutoFillRef.current) {
             setValue(titlePath, (data.title ?? '') as PathValue<T, typeof titlePath>, {
-              shouldValidate: true,
+              shouldValidate: Boolean(data.title?.trim()),
             });
           }
           if (!dirtyMemoRef.current && !skipAutoFillRef.current) {

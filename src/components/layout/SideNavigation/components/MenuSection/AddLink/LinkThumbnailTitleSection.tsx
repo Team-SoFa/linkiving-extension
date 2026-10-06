@@ -4,6 +4,7 @@ import Spinner from '@/components/basics/Spinner/Spinner';
 import TextArea from '@/components/basics/TextArea/TextArea';
 import { MAX_TITLE_LENGTH } from '@/lib/constants/link';
 import Image from 'next/image';
+import { useState } from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 
 import { AddLinkForm } from './hooks/useAddLinkForm';
@@ -27,6 +28,8 @@ export default function LinkThumbnailTitleSection({
   previewImageUrl,
   label = '링크 정보',
 }: Props) {
+  const [hasEditedTitle, setHasEditedTitle] = useState(false);
+
   return (
     <section className="border-gray100 border-b px-6 py-4">
       <Label textSize="sm" className="mb-2 block text-gray900">
@@ -62,15 +65,19 @@ export default function LinkThumbnailTitleSection({
               heightLines={2}
               maxHeightLines={2}
               maxLength={MAX_TITLE_LENGTH}
+              showMax
               isLoading={metaLoading && isValidUrl}
               disabled={shouldDisableDetails}
               value={field.value ?? ''}
-              onChange={e => field.onChange(e)}
+              onChange={e => {
+                setHasEditedTitle(true);
+                field.onChange(e);
+              }}
               className="border-gray100 min-h-[5rem] bg-white text-[1rem]"
             />
           )}
         />
-        {errors.title && !shouldDisableDetails && (
+        {hasEditedTitle && errors.title && !shouldDisableDetails && (
           <span className="text-red500 col-start-2 text-xs">{errors.title.message as string}</span>
         )}
       </div>
