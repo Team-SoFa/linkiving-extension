@@ -37,23 +37,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify extension version
-        run: pnpm version:check
-
-      - name: Run lint
-        run: pnpm lint
-
-      - name: Run typecheck
-        run: pnpm typecheck
-
-      - name: Run tests
-        run: pnpm test
-
-      - name: Build extension
-        run: pnpm build
-
-      - name: Verify extension build artifacts
-        run: pnpm verify:extension
+      - name: Verify extension
+        run: pnpm verify
 
       - name: Verify extension build output
         run: |

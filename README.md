@@ -48,7 +48,10 @@ pnpm version:sync
 pnpm version:check
 pnpm test
 pnpm verify:extension
+pnpm verify # CI와 동일한 전체 검증
 ```
+
+기여와 리뷰·릴리즈 기준은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따릅니다.
 
 `package.json`의 `version`을 릴리스 버전의 기준으로 사용합니다. 버전을 변경한 뒤
 `pnpm version:sync`를 실행하면 원본 manifest가 동기화되며, 릴리스에서는 태그와 빌드

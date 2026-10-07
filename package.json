@@ -14,7 +14,8 @@
     "version:sync": "node scripts/sync-extension-version.mjs",
     "version:check": "node scripts/verify-extension-version.mjs",
     "test": "vitest run",
-    "verify:extension": "node scripts/verify-extension-build.mjs"
+    "verify:extension": "node scripts/verify-extension-build.mjs",
+    "verify": "pnpm version:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:extension"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
