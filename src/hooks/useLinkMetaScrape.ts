@@ -110,7 +110,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
             setMetaErrorMessage(META_SCRAPE_FAILURE_MESSAGE);
           }
           if (!dirtyTitleRef.current && !skipAutoFillRef.current) {
-            setValue(titlePath, truncateLinkTitle(data.title ?? '') as PathValue<T, typeof titlePath>, {
+            setValue(titlePath, truncateLinkTitle((data.title ?? '').trim()) as PathValue<T, typeof titlePath>, {
               shouldValidate: Boolean(data.title?.trim()),
             });
           }
