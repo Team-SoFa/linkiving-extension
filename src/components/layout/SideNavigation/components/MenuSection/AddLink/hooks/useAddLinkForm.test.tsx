@@ -80,6 +80,7 @@ afterEach(async () => {
 describe('메타 수집 실패 후 제목 입력', () => {
   it.each([
     ['가'.repeat(101), '가'.repeat(100)],
+    [' '.repeat(101) + '제목', '제목'],
     ['a'.repeat(99) + '😀', 'a'.repeat(99)],
     ['짧은 제목', '짧은 제목'],
   ])('자동 제목을 제한한 뒤 검증을 통과한다', async (source, expected) => {
