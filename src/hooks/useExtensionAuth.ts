@@ -19,9 +19,9 @@ export function useExtensionAuth() {
     controller.current?.abort();
     const requestController = new AbortController();
     controller.current = requestController;
-    if (useExtensionAuthStore.getState().status !== 'authenticated') {
-      useExtensionAuthStore.setState({ status: 'checking' });
-    }
+    // Keep the last confirmed screen during a background recheck. Replacing the
+    // login button on window focus can remove it between mousedown and click.
+    // The store's initial `checking` state still covers the first authentication.
 
     try {
       const storage = typeof chrome !== 'undefined' ? chrome.storage?.local : undefined;
