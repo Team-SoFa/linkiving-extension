@@ -79,6 +79,21 @@ afterEach(async () => {
 
 describe('메타 수집 실패 후 제목 입력', () => {
   it.each([
+    ['가'.repeat(101), '가'.repeat(100)],
+    ['a'.repeat(99) + '😀', 'a'.repeat(99)],
+    ['짧은 제목', '짧은 제목'],
+  ])('자동 제목을 제한한 뒤 검증을 통과한다', async (source, expected) => {
+    mutateAsync.mockResolvedValue({ ...emptyMeta, title: source });
+    await collectMetadata();
+    expect(current.titleValue).toBe(expected);
+    expect(container.textContent).toContain(`(${expected.length}/100)`);
+    let valid = false;
+    await act(async () => { valid = await current.form.trigger(); });
+    expect(valid).toBe(true);
+    expect(current.form.formState.errors.title).toBeUndefined();
+  });
+
+  it.each([
     ['빈 메타', { ...emptyMeta, url: '' }],
     ['URL만 있는 응답', emptyMeta],
     ['이미지만 있는 응답', { ...emptyMeta, image: 'https://example.com/image.png' }],

@@ -13,6 +13,7 @@ import TextArea from '@/components/basics/TextArea/TextArea';
 import { useDuplicateLinkMutation } from '@/hooks/useCheckDuplicateLink';
 import { usePostLinkMetaScrape } from '@/hooks/usePostLinkMetaScrape';
 import { usePostLinks } from '@/hooks/usePostLinks';
+import { MAX_TITLE_LENGTH, truncateLinkTitle } from '@/lib/constants/link';
 import { getReadableUrlLabel, normalizeHttpUrl } from '@/lib/url';
 import { showToast } from '@/stores/toastStore';
 
@@ -83,7 +84,7 @@ export default function AddMultiLinks({ onToggle }: { onToggle: () => void }) {
           link.id === newId
             ? {
                 ...link,
-                title: meta.title?.trim() || getReadableUrlLabel(normalizedUrl),
+                title: truncateLinkTitle(meta.title?.trim() || getReadableUrlLabel(normalizedUrl)),
                 memo: meta.description?.trim() || '',
                 thumbnailUrl: meta.image ?? null,
                 status: 'success',
@@ -97,7 +98,7 @@ export default function AddMultiLinks({ onToggle }: { onToggle: () => void }) {
           link.id === newId
             ? {
                 ...link,
-                title: getReadableUrlLabel(normalizedUrl),
+                title: truncateLinkTitle(getReadableUrlLabel(normalizedUrl)),
                 status: 'error',
               }
             : link
@@ -114,7 +115,7 @@ export default function AddMultiLinks({ onToggle }: { onToggle: () => void }) {
       links.map(link =>
         createLink.mutateAsync({
           url: link.url,
-          title: link.title || link.url,
+          title: truncateLinkTitle(link.title || link.url),
           memo: link.memo || undefined,
           imageUrl: link.thumbnailUrl || undefined,
         })
@@ -219,12 +220,13 @@ export default function AddMultiLinks({ onToggle }: { onToggle: () => void }) {
                     <>
                       <TextArea
                         value={link.title}
+                        maxLength={MAX_TITLE_LENGTH}
                         placeholder="제목을 직접 입력해 주세요."
                         textSize="sm"
                         onChange={e =>
                           setLinks(prev =>
                             prev.map(item =>
-                              item.id === link.id ? { ...item, title: e.target.value } : item
+                              item.id === link.id ? { ...item, title: truncateLinkTitle(e.target.value) } : item
                             )
                           )
                         }

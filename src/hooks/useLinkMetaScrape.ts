@@ -1,4 +1,5 @@
 import { usePostLinkMetaScrape } from '@/hooks/usePostLinkMetaScrape';
+import { truncateLinkTitle } from '@/lib/constants/link';
 import { FetchError } from '@/lib/api/errors';
 import { useEffect, useRef, useState } from 'react';
 import type {
@@ -109,7 +110,7 @@ export function useLinkMetaScrape<T extends FieldValues & { title?: string; memo
             setMetaErrorMessage(META_SCRAPE_FAILURE_MESSAGE);
           }
           if (!dirtyTitleRef.current && !skipAutoFillRef.current) {
-            setValue(titlePath, (data.title ?? '') as PathValue<T, typeof titlePath>, {
+            setValue(titlePath, truncateLinkTitle(data.title ?? '') as PathValue<T, typeof titlePath>, {
               shouldValidate: Boolean(data.title?.trim()),
             });
           }
